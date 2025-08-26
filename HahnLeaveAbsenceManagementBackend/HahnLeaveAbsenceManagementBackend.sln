@@ -1,0 +1,40 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HahnLeaveAbsenceManagement.Domain", "HahnLeaveAbsenceManagement.Domain\HahnLeaveAbsenceManagement.Domain.csproj", "{D8024FFE-9258-4170-A4C5-0B828952C0E6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HahnLeaveAbsenceManagement.Application", "HahnLeaveAbsenceManagement.Application\HahnLeaveAbsenceManagement.Application.csproj", "{0BBB19F6-3550-43C3-8020-77E47CD1F6BC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HahnLeaveAbsenceManagement.Infrastructure", "HahnLeaveAbsenceManagement.Infrastructure\HahnLeaveAbsenceManagement.Infrastructure.csproj", "{2C40A174-50A6-47B2-923E-85844BE70054}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HahnLeaveAbsenceManagement.Api", "HahnLeaveAbsenceManagement.Api\HahnLeaveAbsenceManagement.Api.csproj", "{02C21AF3-CF41-421D-9FD1-2BF9220BB2B2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HahnLeaveAbsenceManagement.Tests", "HahnLeaveAbsenceManagement.Tests\HahnLeaveAbsenceManagement.Tests.csproj", "{41BAC89F-3EB7-4153-AB93-A01FE1C5C644}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D8024FFE-9258-4170-A4C5-0B828952C0E6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D8024FFE-9258-4170-A4C5-0B828952C0E6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D8024FFE-9258-4170-A4C5-0B828952C0E6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D8024FFE-9258-4170-A4C5-0B828952C0E6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0BBB19F6-3550-43C3-8020-77E47CD1F6BC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0BBB19F6-3550-43C3-8020-77E47CD1F6BC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0BBB19F6-3550-43C3-8020-77E47CD1F6BC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0BBB19F6-3550-43C3-8020-77E47CD1F6BC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2C40A174-50A6-47B2-923E-85844BE70054}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2C40A174-50A6-47B2-923E-85844BE70054}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2C40A174-50A6-47B2-923E-85844BE70054}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2C40A174-50A6-47B2-923E-85844BE70054}.Release|Any CPU.Build.0 = Release|Any CPU
+		{02C21AF3-CF41-421D-9FD1-2BF9220BB2B2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{02C21AF3-CF41-421D-9FD1-2BF9220BB2B2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{02C21AF3-CF41-421D-9FD1-2BF9220BB2B2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{02C21AF3-CF41-421D-9FD1-2BF9220BB2B2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{41BAC89F-3EB7-4153-AB93-A01FE1C5C644}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{41BAC89F-3EB7-4153-AB93-A01FE1C5C644}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{41BAC89F-3EB7-4153-AB93-A01FE1C5C644}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{41BAC89F-3EB7-4153-AB93-A01FE1C5C644}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
