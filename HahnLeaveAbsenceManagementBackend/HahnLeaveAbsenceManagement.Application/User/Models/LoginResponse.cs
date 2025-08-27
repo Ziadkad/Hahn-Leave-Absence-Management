@@ -9,6 +9,7 @@ public record LoginResponse()
     public string FirstName {get; set;}
     public string LastName {get; set;}
     public UserRole Role {get; set;}
+    public int LeavesLeft { get; set; }
     public string? Token {get; set;}
     public DateTime? TokenExpiresAt {get; set;}
 };
