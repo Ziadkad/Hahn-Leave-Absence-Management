@@ -53,6 +53,11 @@ public class ErrorHandlingMiddleware(RequestDelegate next, ILogger<ErrorHandling
             message = ex.Message;
             code = HttpStatusCode.BadRequest;
         }
+        else if (ex.GetType() == typeof(DuplicateException))
+        {
+            message = ex.Message;
+            code = HttpStatusCode.Conflict;
+        }
         else if (ex.GetType() == typeof(InternalServerException))
         {
             message = ex.Message;
