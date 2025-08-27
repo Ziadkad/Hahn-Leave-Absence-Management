@@ -47,11 +47,10 @@ public class UpdateLeaveRequestStatusCommandHandler(ILeaveRequestRepository leav
             }
         }
         
-        else if (userContext.GetUserRole() == UserRole.HumanResourcesManager && (request.Status == LeaveStatus.Cancelled || request.Status == LeaveStatus.Pending))
+        else if (userContext.GetUserRole() == UserRole.HumanResourcesManager && request.Status == LeaveStatus.Pending)
         { 
             throw new BadRequestException(
-                "Invalid status change for HR: 'Pending' or 'Cancelled' are not allowed targets. " +
-                "HR may only set status to 'Approved' or 'Rejected'."
+                "Invalid status change for HR: 'Pending' are not allowed targets." 
             );
         }
         

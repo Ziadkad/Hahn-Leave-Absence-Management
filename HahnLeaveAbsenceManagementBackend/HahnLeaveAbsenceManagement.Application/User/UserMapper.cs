@@ -8,5 +8,6 @@ public class UserMapper : Profile
     public UserMapper()
     {
         CreateMap<Domain.User.User, LoginResponse>();
+        CreateMap<Domain.User.User, UserDto>();
     }
 }

@@ -8,5 +8,7 @@ public class LeaveRequestMapper : Profile
     public LeaveRequestMapper()
     {
         CreateMap<Domain.LeaveRequest.LeaveRequest, LeaveRequestDto>();
+        CreateMap<Domain.LeaveRequest.LeaveRequest, LeaveRequestWithUserDto>();
+
     }
 }

@@ -25,8 +25,4 @@
       <ProjectReference Include="..\HahnLeaveAbsenceManagement.Domain\HahnLeaveAbsenceManagement.Domain.csproj" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="User\Queries\" />
-    </ItemGroup>
-
 </Project>
