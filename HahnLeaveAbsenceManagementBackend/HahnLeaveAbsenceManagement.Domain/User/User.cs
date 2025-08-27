@@ -9,6 +9,7 @@ public class User : BaseModel
     public string Password { get; private set; }
     public string FirstName { get; private set; }
     public string LastName { get; private set; }
+    public int LeavesLeft { get; private set; }
     public UserRole Role { get; private set; }
     
     public List<LeaveRequest.LeaveRequest> LeaveRequests { get; private set; }
@@ -21,5 +22,16 @@ public class User : BaseModel
         FirstName = firstName;
         LastName = lastName;
         Role = role;
+        LeavesLeft = 18;
+    }
+
+    public void AddLeaveDays(int days)
+    {
+        LeavesLeft += days;
+    }
+
+    public void RemoveLeaveDays(int days)
+    {
+        LeavesLeft -= days;
     }
 }

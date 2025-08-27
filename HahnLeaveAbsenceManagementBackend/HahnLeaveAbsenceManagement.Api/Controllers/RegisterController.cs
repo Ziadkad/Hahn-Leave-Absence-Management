@@ -14,7 +14,7 @@ public class RegisterController : ControllerBase
     protected IMediator Mediator => _mediator ??= HttpContext.RequestServices.GetService<IMediator>() ?? throw new InvalidOperationException("Mediator not found in request services.");
     
     [HttpPost]
-    public async Task<ActionResult<LoginResponse>> Register([FromForm] RegisterCommand command)
+    public async Task<ActionResult<LoginResponse>> Register([FromBody] RegisterCommand command)
     {
         var result = await Mediator.Send(command);
         return Ok(result);

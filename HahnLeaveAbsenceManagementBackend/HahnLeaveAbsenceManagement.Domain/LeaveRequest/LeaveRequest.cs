@@ -1,4 +1,6 @@
 ﻿
+using System.Data;
+
 namespace HahnLeaveAbsenceManagement.Domain.LeaveRequest;
 
 public class LeaveRequest
@@ -14,14 +16,20 @@ public class LeaveRequest
     public Guid UserId { get; private set; }
     public User.User User { get; private set; }
 
-    public LeaveRequest(LeaveType type, DateTime startDate, DateTime endDate, int businessDays, Guid userId)
+    public LeaveRequest(LeaveType type, DateTime startDate, DateTime endDate, string description, int businessDays, Guid userId)
     {
         Id = Guid.NewGuid();
         Type = type;
         StartDate = startDate;
         EndDate = endDate;
+        Description = description;
         BusinessDays = businessDays;
         UserId = userId;
         Status = LeaveStatus.Pending;
+    }
+
+    public void UpdateStatus(LeaveStatus status)
+    {
+        Status = status;
     }
 }

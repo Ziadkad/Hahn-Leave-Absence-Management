@@ -6,18 +6,45 @@ namespace HahnLeaveAbsenceManagement.Infrastructure.Data;
 
 public class AppDbContext(DbContextOptions<AppDbContext> options, IUserContext userContext) : DbContext(options),IUnitOfWork
 {
+    private bool _skipAudit = false;
+
+    public IDisposable TemporarilySkipAudit()
+    {
+        _skipAudit = true;
+        return new RestoreAuditFlag(this);
+    }
+
+    private class RestoreAuditFlag : IDisposable
+    {
+        private readonly AppDbContext _context;
+        private readonly bool _originalValue;
+
+        public RestoreAuditFlag(AppDbContext context)
+        {
+            _context = context;
+            _originalValue = context._skipAudit;
+        }
+
+        public void Dispose()
+        {
+            _context._skipAudit = false;
+        }
+    }
     public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
-        foreach (var entry in ChangeTracker.Entries<BaseModel>())
+        if (!_skipAudit)
         {
-            switch (entry.State)
+            foreach (var entry in ChangeTracker.Entries<BaseModel>())
             {
-                case EntityState.Added:
-                    entry.Entity.CreateAudit(userContext.GetCurrentUserId());
-                    break;
-                case EntityState.Modified:
-                    entry.Entity.UpdateAudit(userContext.GetCurrentUserId());
-                    break;
+                switch (entry.State)
+                {
+                    case EntityState.Added:
+                        entry.Entity.CreateAudit(userContext.GetCurrentUserId());
+                        break;
+                    case EntityState.Modified:
+                        entry.Entity.UpdateAudit(userContext.GetCurrentUserId());
+                        break;
+                }
             }
         }
 

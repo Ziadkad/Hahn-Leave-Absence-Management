@@ -2,6 +2,7 @@
 using FluentValidation;
 using HahnLeaveAbsenceManagement.Application.Common.Helper;
 using HahnLeaveAbsenceManagement.Application.Common.Interfaces;
+using HahnLeaveAbsenceManagement.Application.User;
 using HahnLeaveAbsenceManagement.Domain.Common;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -14,7 +15,7 @@ public static class DependencyInjection
     {
         services.AddMediatR(x => x.RegisterServicesFromAssemblies(Assembly.GetExecutingAssembly(), Assembly.GetAssembly(typeof(BaseModel))!));
         services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
-        // services.AddAutoMapper(typeof(ResourceMapper).Assembly);
+        services.AddAutoMapper(typeof(UserMapper).Assembly);
 
         services.AddScoped<ITokenService, TokenService>();
     }

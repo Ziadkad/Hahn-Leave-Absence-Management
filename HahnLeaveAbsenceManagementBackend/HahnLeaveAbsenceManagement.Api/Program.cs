@@ -1,6 +1,9 @@
+using HahnLeaveAbsenceManagement.Api.Middlewares;
 using HahnLeaveAbsenceManagement.Api.Security;
 using HahnLeaveAbsenceManagement.Application;
 using HahnLeaveAbsenceManagement.Infrastructure;
+using HahnLeaveAbsenceManagement.Infrastructure.Data;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -30,9 +33,20 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseMiddleware(typeof(ErrorHandlingMiddleware));
 
 app.UseAuthorization();
 
 app.MapControllers();
 
+MigrateDbToLatestVersion(app);
+
 await app.RunAsync();
+
+
+static void MigrateDbToLatestVersion(IApplicationBuilder app)
+{
+    using var scope = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>().CreateScope();
+    var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    context.Database.Migrate();
+}

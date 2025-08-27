@@ -54,12 +54,14 @@ public class RegisterCommandHandler(
         var passwordHash = BCrypt.Net.BCrypt.HashPassword(request.Password);
         Domain.User.User user = new Domain.User.User(request.Email, passwordHash, request.FirstName, request.LastName, request.Role);
         await userRepository.AddAsync(user,cancellationToken);
-        var isSaved = await unitOfWork.SaveChangesAsync(cancellationToken);
-        if (isSaved <= 0)
+        using (unitOfWork.TemporarilySkipAudit())
         {
-            throw new InternalServerException();
+            var isSaved = await unitOfWork.SaveChangesAsync(cancellationToken);
+            if (isSaved <= 0)
+            {
+                throw new InternalServerException();
+            }
         }
-        
         var jwtSettings = configuration.GetSection("JwtSettings");
         var expirationMinutes = int.Parse(jwtSettings["ExpiryMinutes"]);
         LoginResponse response = mapper.Map<LoginResponse>(user);
