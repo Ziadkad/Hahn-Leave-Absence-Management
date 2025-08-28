@@ -8,6 +8,7 @@ import { LoginPageComponent } from './features/auth/pages/login-page/login-page.
 import { RegisterPageComponent } from './features/auth/pages/register-page/register-page.component';
 import { RegisterFormComponent } from './features/auth/components/register-form/register-form.component';
 import { LoginFormComponent } from './features/auth/components/login-form/login-form.component';
+import { DashboardPageComponent } from './features/dashboard/pages/dashboard-page/dashboard-page.component';
 
 @NgModule({
   declarations: [
@@ -16,7 +17,8 @@ import { LoginFormComponent } from './features/auth/components/login-form/login-
     LoginPageComponent,
     RegisterPageComponent,
     RegisterFormComponent,
-    LoginFormComponent
+    LoginFormComponent,
+    DashboardPageComponent
   ],
   imports: [
     BrowserModule,
