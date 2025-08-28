@@ -1,1 +1,32 @@
-<p>register-page works!</p>
+<!-- Full-height centered layout -->
+<div class="bg-white text-slate-800 h-full flex items-center justify-center px-6 pb-20">
+  <div class="w-full max-w-2xl">
+    <!-- Brand -->
+    <div class="mb-6 text-center">
+      <div class="inline-flex items-center gap-3">
+        <div class="h-10 w-10 rounded-xl border border-emerald-200 bg-white shadow-sm relative">
+          <div class="h-3 w-full rounded-t-xl bg-emerald-500"></div>
+          <div class="absolute -top-1 left-2 h-2 w-2 rounded-full bg-emerald-500"></div>
+          <div class="absolute -top-1 right-2 h-2 w-2 rounded-full bg-emerald-500"></div>
+        </div>
+        <div class="text-left">
+          <div class="text-lg font-semibold tracking-tight">Hahn</div>
+          <div class="text-sm text-slate-500">Leave &amp; Absence Management</div>
+        </div>
+      </div>
+      <h1 class="mt-6 text-2xl font-semibold tracking-tight">Create your account</h1>
+      <p class="text-slate-500 text-sm">Fill in the details to register</p>
+    </div>
+
+    <!-- Card -->
+    <div class="p-6">
+      <app-register-form></app-register-form>
+    </div>
+
+    <!-- Footer -->
+    <p class="text-center text-sm text-slate-500">
+      Already have an account?
+      <a routerLink="/login" class="text-emerald-700 hover:underline">Sign in</a>
+    </p>
+  </div>
+</div>

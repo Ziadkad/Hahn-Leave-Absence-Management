@@ -22,6 +22,19 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("frontend",
+        policy =>
+        {
+            policy.WithOrigins("http://localhost:4200")
+                .AllowAnyMethod()
+                .AllowAnyHeader();
+        });
+
+});
+
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -38,6 +51,8 @@ app.UseMiddleware(typeof(ErrorHandlingMiddleware));
 app.UseAuthorization();
 
 app.MapControllers();
+
+app.UseCors("frontend");
 
 MigrateDbToLatestVersion(app);
 
