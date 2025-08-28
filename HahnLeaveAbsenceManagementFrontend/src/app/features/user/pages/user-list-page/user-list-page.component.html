@@ -1,0 +1,105 @@
+<div class="p-6">
+  <!-- Header -->
+  <h2 class="text-lg font-semibold text-slate-800 mb-4 flex items-center gap-2">
+    <!-- Icon -->
+    <div class="h-6 w-6 rounded-md bg-emerald-100 text-emerald-600 flex items-center justify-center">
+      <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-users-icon lucide-users"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><path d="M16 3.128a4 4 0 0 1 0 7.744"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><circle cx="9" cy="7" r="4"/></svg>
+    </div>
+    User List
+  </h2>
+
+  <!-- Error -->
+  <div *ngIf="errorMessage" class="text-sm text-red-600 mb-3 border border-red-200 bg-red-50 rounded-md px-3 py-2">
+    {{ errorMessage }}
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="isLoading" class="text-slate-500 text-sm">Loading users...</div>
+
+  <!-- Table -->
+  <div *ngIf="!isLoading && users.length > 0" class="overflow-x-auto">
+    <table class="min-w-full border border-slate-200 rounded-lg overflow-hidden">
+      <thead class="bg-emerald-50">
+      <tr>
+        <th class="px-4 py-2 text-left text-sm font-semibold text-emerald-700">First Name</th>
+        <th class="px-4 py-2 text-left text-sm font-semibold text-emerald-700">Last Name</th>
+        <th class="px-4 py-2 text-left text-sm font-semibold text-emerald-700">Role</th>
+        <th class="px-4 py-2 text-center text-sm font-semibold text-emerald-700">Leaves Left</th>
+        <th class="px-4 py-2 text-right text-sm font-semibold text-emerald-700">Actions</th>
+      </tr>
+      </thead>
+
+      <tbody class="divide-y divide-slate-200">
+      <tr *ngFor="let u of users" class="hover:bg-emerald-50 transition">
+        <td class="px-4 py-2 text-sm text-slate-800">{{ u.firstName }}</td>
+        <td class="px-4 py-2 text-sm text-slate-800">{{ u.lastName }}</td>
+        <td class="px-4 py-2 text-sm">{{ UserRole[u.role] }}</td>
+        <td class="px-4 py-2 text-center text-sm text-slate-800 font-semibold">
+          {{ u.leavesLeft }}
+        </td>
+        <td class="px-4 py-2 text-right">
+          <span
+            class="text-emerald-600 text-sm underline cursor-pointer hover:text-emerald-700 disabled:opacity-50"
+            (click)="openAddLeaves(u)"
+            [class.pointer-events-none]="isMutating"
+          >
+            Add leaves
+          </span>
+
+        </td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div *ngIf="!isLoading && users.length === 0" class="text-slate-500 text-sm text-center py-6 border border-slate-200 rounded-md bg-slate-50">
+    No users found.
+  </div>
+
+</div>
+
+<!-- Add Leaves Modal -->
+<div
+  *ngIf="showAddDialog"
+  class="fixed inset-0 z-50 flex items-center justify-center bg-black/30"
+>
+  <div class="w-full max-w-md rounded-xl bg-white p-5 shadow-xl">
+    <div class="mb-4">
+      <h3 class="text-lg font-semibold text-slate-800">Add leaves</h3>
+      <p class="text-sm text-slate-500">
+        {{ selectedUser?.firstName }} {{ selectedUser?.lastName }} —
+        current: <span class="font-medium">{{ selectedUser?.leavesLeft }}</span> days
+      </p>
+    </div>
+
+    <div class="space-y-3">
+      <label class="block text-sm font-medium text-slate-700" for="daysInput">Days to add</label>
+      <input
+        id="daysInput"
+        type="number"
+        min="1"
+        class="w-full rounded-lg border border-slate-300 px-3 py-2 outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+        [(ngModel)]="daysToAdd"
+      />
+
+      <div *ngIf="inlineError" class="text-sm text-red-600">{{ inlineError }}</div>
+    </div>
+
+    <div class="mt-5 flex items-center justify-end gap-2">
+      <button
+        class="rounded-lg border border-slate-300 px-3 py-1.5 text-sm text-slate-700 hover:bg-slate-50"
+        (click)="cancelAddLeaves()"
+        [disabled]="isMutating"
+      >
+        Cancel
+      </button>
+      <button
+        class="rounded-lg bg-emerald-600 px-3 py-1.5 text-sm text-white hover:bg-emerald-700 disabled:opacity-50"
+        (click)="submitAddLeaves()"
+        [disabled]="isMutating"
+      >
+        {{ isMutating ? 'Adding...' : 'Add' }}
+      </button>
+    </div>
+  </div>
+</div>

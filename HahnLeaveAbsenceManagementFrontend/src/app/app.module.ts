@@ -13,6 +13,9 @@ import {ToastrModule} from "ngx-toastr";
 import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {HttpClientModule} from "@angular/common/http";
+import { UserListPageComponent } from './features/user/pages/user-list-page/user-list-page.component';
+import { LeaveRequestListPageComponent } from './features/leave-request/pages/leave-request-list-page/leave-request-list-page.component';
+import {appConfig} from "./core/interceptors/appConfig";
 
 @NgModule({
   declarations: [
@@ -22,7 +25,9 @@ import {HttpClientModule} from "@angular/common/http";
     RegisterPageComponent,
     RegisterFormComponent,
     LoginFormComponent,
-    DashboardPageComponent
+    DashboardPageComponent,
+    UserListPageComponent,
+    LeaveRequestListPageComponent
   ],
   imports: [
     BrowserModule,
@@ -37,7 +42,7 @@ import {HttpClientModule} from "@angular/common/http";
       preventDuplicates: true
     }),
   ],
-  providers: [],
+  providers: [appConfig],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
