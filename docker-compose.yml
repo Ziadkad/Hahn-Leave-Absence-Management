@@ -9,8 +9,8 @@ services:
       - SA_PASSWORD=${SA_PASSWORD:-Ziad1234}
     ports:
       - "1433:1433"
-    volumes:
-      - sqlserver_data:/var/opt/mssql
+    # volumes:
+    #   - sqlserver_data:/var/opt/mssql
     networks:
       - OurNetworks-App
     restart: unless-stopped
@@ -49,5 +49,5 @@ networks:
     driver: bridge
 
 
-volumes:
-  sqlserver_data:
+# volumes:
+#   sqlserver_data:
