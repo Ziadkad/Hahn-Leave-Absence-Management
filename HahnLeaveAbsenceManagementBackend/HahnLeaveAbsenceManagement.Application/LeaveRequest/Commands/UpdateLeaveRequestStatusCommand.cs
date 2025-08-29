@@ -20,7 +20,7 @@ public class UpdateLeaveRequestStatusCommandValidator: AbstractValidator<UpdateL
             .WithMessage("Invalid leave type.");
     }
 }
-public class UpdateLeaveRequestStatusCommandHandler(ILeaveRequestRepository leaveRequestRepository, IUnitOfWork unitOfWork, IUserContext userContext, IMapper mapper) : IRequestHandler<UpdateLeaveRequestStatusCommand, LeaveRequestDto>
+public class UpdateLeaveRequestStatusCommandHandler(ILeaveRequestRepository leaveRequestRepository, IUserRepository userRepository, IUnitOfWork unitOfWork, IUserContext userContext, IMapper mapper) : IRequestHandler<UpdateLeaveRequestStatusCommand, LeaveRequestDto>
 {
     public async Task<LeaveRequestDto> Handle(UpdateLeaveRequestStatusCommand request, CancellationToken cancellationToken)
     {
@@ -28,6 +28,12 @@ public class UpdateLeaveRequestStatusCommandHandler(ILeaveRequestRepository leav
         if (leaveRequest == null)
         {
             throw new NotFoundException(nameof(LeaveRequest), request.Id);
+        }
+        
+        
+        if (leaveRequest.Status != LeaveStatus.Pending)
+        {
+            throw new BadRequestException("Only leave requests with status 'Pending' can be cancelled.");
         }
         
         if (userContext.GetUserRole() == UserRole.Employee)
@@ -40,11 +46,6 @@ public class UpdateLeaveRequestStatusCommandHandler(ILeaveRequestRepository leav
             {
                 throw new ForbiddenException();
             }
-
-            if (leaveRequest.Status != LeaveStatus.Pending)
-            {
-                throw new BadRequestException("Only leave requests with status 'Pending' can be cancelled.");
-            }
         }
         
         else if (userContext.GetUserRole() == UserRole.HumanResourcesManager && request.Status == LeaveStatus.Pending)
@@ -52,6 +53,16 @@ public class UpdateLeaveRequestStatusCommandHandler(ILeaveRequestRepository leav
             throw new BadRequestException(
                 "Invalid status change for HR: 'Pending' are not allowed targets." 
             );
+        }
+
+        if (leaveRequest.Status != LeaveStatus.Approved)
+        {
+            Domain.User.User? user = await userRepository.FindAsync(leaveRequest.UserId, cancellationToken);
+            if (user == null)
+            {
+                throw new NotFoundException(nameof(User), request.Id);
+            }
+            user.AddLeaveDays(leaveRequest.BusinessDays);
         }
         
         leaveRequest.UpdateStatus(request.Status);
