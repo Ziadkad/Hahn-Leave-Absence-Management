@@ -12,6 +12,7 @@ import interactionPlugin from '@fullcalendar/interaction';
 import {LeaveType} from "../../../../core/interfaces/leave-request-interfaces/leave-type";
 import {AbstractControl, FormBuilder, FormGroup, Validators} from "@angular/forms";
 import {CreateLeaveRequest} from "../../../../core/interfaces/leave-request-interfaces/create-leave-request";
+import {UserService} from "../../../../core/services/user-service/user.service";
 
 
 @Component({
@@ -26,6 +27,7 @@ export class RequestNewLeaveComponent implements OnInit {
 
   myLeavesRequest : LeaveRequestWithUser[] = [];
   userId : string | undefined = undefined;
+  leavesLeft : number = 0;
 
   isLoading = false;
   isSubmitting = false;
@@ -55,6 +57,7 @@ export class RequestNewLeaveComponent implements OnInit {
 
   constructor(private readonly leaveRequestService: LeaveRequestService,
               private readonly authService: AuthService,
+              private readonly userService: UserService,
               private readonly toastr: ToastrService,
               private readonly fb: FormBuilder
   ) {
@@ -66,6 +69,7 @@ export class RequestNewLeaveComponent implements OnInit {
 
   ngOnInit(): void {
     this.getMyLeaveRequests();
+    this.getLeavesLeft();
     this.createForm = this.fb.group(
       {
         type: [null as LeaveType | null, Validators.required],
@@ -78,6 +82,17 @@ export class RequestNewLeaveComponent implements OnInit {
 
   }
 
+
+  getLeavesLeft(){
+    this.userService.getLeavesLeft().subscribe({
+      next: data => {
+        this.leavesLeft = data;
+      },
+      error: err => {
+        console.log(err);
+      }
+    })
+  }
 
   getMyLeaveRequests() {
     this.isLoading = true;
@@ -199,6 +214,7 @@ export class RequestNewLeaveComponent implements OnInit {
         next: () => {
           this.toastr.success('Leave request created.', 'Success', { timeOut: 3000 });
           this.getMyLeaveRequests();
+          this.getLeavesLeft();
           this.createForm.reset({ type: null, startDate: null, endDate: null, description: '' });
           const api = this.calendarRef?.getApi();
           api?.unselect?.();

@@ -1,8 +1,11 @@
 <div class="p-4">
   <div class="flex items-center justify-between mb-3">
     <h2 class="text-lg font-semibold text-slate-800">My Leaves Calendar</h2>
-  </div>
 
+      <span class="inline-flex items-center rounded-full bg-emerald-100 text-emerald-700 px-2.5 py-0.5 text-xs font-semibold">
+        Leaves left: {{ leavesLeft }} days
+      </span>
+  </div>
   <!-- Compact create form -->
   <form [formGroup]="createForm"  (ngSubmit)="onCreateSubmit()" class="mb-3">
     <div class="grid grid-cols-1 md:grid-cols-12 gap-3 items-end">

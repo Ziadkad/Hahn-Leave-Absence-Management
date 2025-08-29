@@ -28,4 +28,13 @@ public class UserController : BaseController
         var result = await Mediator.Send(command);
         return Ok(result);
     }
+
+    [Authorize]
+    [HttpGet("getLeavesLeft")]
+    public async Task<IActionResult> GetLeavesLeft()
+    {
+        var result = await Mediator.Send(new GetLeavesLeftQuery());
+        return Ok(result);
+    }
+    
 }

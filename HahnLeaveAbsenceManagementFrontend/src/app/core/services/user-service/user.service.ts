@@ -17,7 +17,12 @@ export class UserService {
     return this.http.get<User[]>(`${this.baseUrl}`);
   }
 
-  addLeaves(userId: string, payload: AddLeavesRequest): Observable<any> {
-    return this.http.put(`${this.baseUrl}/AddLeaves/${userId}`, payload);
+  addLeaves(userId: string, payload: AddLeavesRequest): Observable<User> {
+    return this.http.put<User>(`${this.baseUrl}/AddLeaves/${userId}`, payload);
   }
+
+  getLeavesLeft():Observable<number>{
+    return this.http.get<number>(`${this.baseUrl}/getLeavesLeft`)
+  }
+
 }
