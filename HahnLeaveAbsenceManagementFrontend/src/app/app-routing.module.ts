@@ -12,15 +12,20 @@ import {
   MyLeaveRequestPageComponent
 } from "./features/leave-request/pages/my-leave-request-page/my-leave-request-page.component";
 import {RequestNewLeaveComponent} from "./features/leave-request/pages/request-new-leave/request-new-leave.component";
+import {HomePageComponent} from "./features/home/pages/home-page/home-page.component";
+import {authGuard} from "./core/guards/auth-guard/auth.guard";
+import {roleGuard} from "./core/guards/role-guard/role.guard";
+import {UserRole} from "./core/interfaces/user-interfaces/user-Role";
 
 const routes: Routes = [
-  { path: 'dashboard', component: DashboardPageComponent },
-  { path: 'login', component: LoginPageComponent},
-  { path: 'register', component: RegisterPageComponent},
-  { path: 'users', component: UserListPageComponent},
-  { path: 'leaveRequests', component: LeaveRequestListPageComponent},
-  { path: 'myleaverequests', component: MyLeaveRequestPageComponent},
-  { path: 'requestnewleave', component: RequestNewLeaveComponent}
+  { path: '', component: HomePageComponent },
+  { path: 'dashboard', component: DashboardPageComponent,canActivate:[authGuard,roleGuard],  data: { roles: [UserRole.HumanResourcesManager] } },
+  { path: 'login', component: LoginPageComponent , canActivate:[guestGuard]},
+  { path: 'register', component: RegisterPageComponent, canActivate:[guestGuard]},
+  { path: 'users', component: UserListPageComponent, canActivate:[authGuard,roleGuard],  data: { roles: [UserRole.HumanResourcesManager] }},
+  { path: 'leaveRequests', component: LeaveRequestListPageComponent, canActivate:[authGuard]},
+  { path: 'myleaverequests', component: MyLeaveRequestPageComponent, canActivate:[authGuard]},
+  { path: 'requestnewleave', component: RequestNewLeaveComponent, canActivate:[authGuard]},
 ];
 
 @NgModule({

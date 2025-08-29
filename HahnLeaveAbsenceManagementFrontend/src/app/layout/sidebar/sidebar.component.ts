@@ -29,4 +29,6 @@ export class SidebarComponent {
     this.toastr.success('Logged out');
     this.router.navigate(['']);
   }
+
+  protected readonly UserRole = UserRole;
 }

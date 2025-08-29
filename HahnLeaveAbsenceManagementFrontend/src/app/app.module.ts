@@ -20,6 +20,7 @@ import { MyLeaveRequestPageComponent } from './features/leave-request/pages/my-l
 import {FullCalendarModule} from "@fullcalendar/angular";
 import { RequestNewLeaveComponent } from './features/leave-request/pages/request-new-leave/request-new-leave.component';
 import {NgApexchartsModule} from "ng-apexcharts";
+import { HomePageComponent } from './features/home/pages/home-page/home-page.component';
 
 @NgModule({
   declarations: [
@@ -33,7 +34,8 @@ import {NgApexchartsModule} from "ng-apexcharts";
     UserListPageComponent,
     LeaveRequestListPageComponent,
     MyLeaveRequestPageComponent,
-    RequestNewLeaveComponent
+    RequestNewLeaveComponent,
+    HomePageComponent
   ],
   imports: [
     BrowserModule,
