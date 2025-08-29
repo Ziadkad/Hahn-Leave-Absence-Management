@@ -19,6 +19,7 @@ import {appConfig} from "./core/interceptors/appConfig";
 import { MyLeaveRequestPageComponent } from './features/leave-request/pages/my-leave-request-page/my-leave-request-page.component';
 import {FullCalendarModule} from "@fullcalendar/angular";
 import { RequestNewLeaveComponent } from './features/leave-request/pages/request-new-leave/request-new-leave.component';
+import {NgApexchartsModule} from "ng-apexcharts";
 
 @NgModule({
   declarations: [
@@ -47,6 +48,7 @@ import { RequestNewLeaveComponent } from './features/leave-request/pages/request
       preventDuplicates: true
     }),
     FullCalendarModule,
+    NgApexchartsModule,
   ],
   providers: [appConfig],
   bootstrap: [AppComponent]

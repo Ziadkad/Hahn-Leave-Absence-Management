@@ -1,9 +1,49 @@
-import {Component} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {LeaveStatus} from "../../../../core/interfaces/leave-request-interfaces/leave-status";
-import {finalize, forkJoin, map} from "rxjs";
-import * as console from "node:console";
 import {LeaveRequestService} from "../../../../core/services/leave-request-service/leave-request.service";
 import {LeaveRequestWithUser} from "../../../../core/interfaces/leave-request-interfaces/leave-request-with-user";
+import {
+  ApexAxisChartSeries,
+  ApexChart, ApexDataLabels, ApexGrid,
+  ApexLegend,
+  ApexNonAxisChartSeries,
+  ApexResponsive, ApexStroke,
+  ApexTooltip, ApexXAxis, ApexYAxis
+} from "ng-apexcharts";
+
+
+
+type DonutOptions = {
+  series: ApexNonAxisChartSeries;
+  chart: ApexChart;
+  labels: string[];
+  legend: ApexLegend;
+  responsive?: ApexResponsive[];
+  tooltip?: ApexTooltip;
+};
+
+type BarOptions = {
+  series: ApexAxisChartSeries;
+  chart: ApexChart;
+  xaxis: ApexXAxis;
+  dataLabels: ApexDataLabels;
+  legend: ApexLegend;
+  tooltip?: ApexTooltip;
+  grid?: ApexGrid;
+  yaxis?: ApexYAxis;
+};
+
+type LineOptions = {
+  series: ApexAxisChartSeries;
+  chart: ApexChart;
+  xaxis: ApexXAxis;
+  dataLabels: ApexDataLabels;
+  stroke: ApexStroke;
+  legend: ApexLegend;
+  tooltip?: ApexTooltip;
+  yaxis?: ApexYAxis;
+  grid?: ApexGrid;
+};
 
 
 @Component({
@@ -12,7 +52,8 @@ import {LeaveRequestWithUser} from "../../../../core/interfaces/leave-request-in
   templateUrl: './dashboard-page.component.html',
   styleUrl: './dashboard-page.component.css'
 })
-export class DashboardPageComponent {
+
+export class DashboardPageComponent implements OnInit {
   isPendingLoading : boolean = false;
   pendingErrorMessage : string | null = null;
 
@@ -31,7 +72,18 @@ export class DashboardPageComponent {
   pendingLeaveRequests: LeaveRequestWithUser[] = [];
   pendingCount : number = 0;
 
+
+  pendingDonut!: Partial<DonutOptions>;
+  approvedNext30Bar!: Partial<BarOptions>;
+  outNext30Line!: Partial<LineOptions>;
+
   constructor(private readonly leaveRequestService : LeaveRequestService) {
+  }
+
+  ngOnInit(): void {
+    this.getPendingLeaveRequests();
+    this.getPeopleOutToday();
+    this.nextMonthApprovedLeaveRequests();
   }
 
   getPendingLeaveRequests() {
@@ -147,6 +199,90 @@ export class DashboardPageComponent {
         this.isOutTodayLoading = false;
       }
     });
+  }
+
+
+
+  private refreshPendingDonut() {
+    const counts = this.countByType(this.pendingLeaveRequests);
+    const labels = Object.keys(counts);
+    const series = labels.map((k) => counts[k]);
+
+    this.pendingDonut = {
+      series,
+      labels,
+      chart: { type: 'donut', height: 260 },
+      legend: { position: 'bottom' },
+      responsive: [{ breakpoint: 768, options: { chart: { height: 240 }, legend: { position: 'bottom' } } }],
+      tooltip: { y: { formatter: (v: number) => `${v} req` } },
+    };
+  }
+
+  private refreshApprovedNext30Bar() {
+    const counts = this.countByType(this.monthApprovedLeaveRequests);
+    const categories = Object.keys(counts);
+    const data = categories.map((k) => counts[k]);
+
+    this.approvedNext30Bar = {
+      series: [{ name: 'Approved (next 30 days)', data }],
+      chart: { type: 'bar', height: 300 },
+      xaxis: { categories, labels: { rotate: 0 } },
+      dataLabels: { enabled: true },
+      legend: { position: 'top' },
+      grid: { strokeDashArray: 3 },
+      tooltip: { y: { formatter: (v: number) => `${v} req` } },
+      yaxis: { min: 0, forceNiceScale: true },
+    };
+  }
+
+  private refreshOutNext30Line() {
+    const start = this.startOfToday();
+    const days = Array.from({ length: 30 }, (_, i) => {
+      const s = new Date(start);
+      s.setDate(s.getDate() + i);
+      const e = new Date(s);
+      e.setDate(e.getDate() + 1);
+      return { s, e, label: this.shortDate(s) };
+    });
+
+    const seriesData = days.map(({ s, e }) =>
+      this.monthApprovedLeaveRequests.filter((r) => {
+        const rs = new Date((r as any).startDate);
+        const re = new Date((r as any).endDate);
+        return rs < e && re >= s; // overlaps day
+      }).length
+    );
+
+    this.outNext30Line = {
+      series: [{ name: 'People out', data: seriesData }],
+      chart: { type: 'line', height: 280, zoom: { enabled: false } },
+      xaxis: { categories: days.map((d) => d.label) },
+      dataLabels: { enabled: false },
+      stroke: { curve: 'smooth', width: 3 },
+      legend: { position: 'top' },
+      grid: { strokeDashArray: 3 },
+      yaxis: { min: 0, forceNiceScale: true },
+      tooltip: { y: { formatter: (v: number) => `${v} people` } },
+    };
+  }
+
+  private countByType(items: LeaveRequestWithUser[]): Record<string, number> {
+    const map: Record<string, number> = {};
+    for (const r of items) {
+      const t: string = (r as any).type ?? 'Unknown';
+      map[t] = (map[t] ?? 0) + 1;
+    }
+    return map;
+  }
+
+  private startOfToday(): Date {
+    const d = new Date();
+    return new Date(d.getFullYear(), d.getMonth(), d.getDate());
+  }
+
+  private shortDate(d: Date): string {
+    // e.g., 29 Aug
+    return d.toLocaleDateString(undefined, { day: '2-digit', month: 'short' });
   }
 
 }

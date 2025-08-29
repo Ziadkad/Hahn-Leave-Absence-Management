@@ -1,1 +1,204 @@
-<h2>dashboard</h2>
+<!-- Page Header / Quick Stats -->
+<div class="mb-6">
+  <div class="flex items-center justify-between">
+    <h1 class="text-xl font-semibold text-slate-800">Dashboard</h1>
+    <div class="flex items-center gap-2">
+      <span class="inline-flex items-center rounded-lg bg-emerald-50 text-emerald-700 px-3 py-1 text-sm ring-1 ring-emerald-200">
+        Pending: <span class="ml-1 font-semibold">{{ pendingCount }}</span>
+      </span>
+      <span class="inline-flex items-center rounded-lg bg-emerald-50 text-emerald-700 px-3 py-1 text-sm ring-1 ring-emerald-200">
+        Out Today: <span class="ml-1 font-semibold">{{ outTodayPeopleCount }}</span>
+      </span>
+      <span class="inline-flex items-center rounded-lg bg-emerald-50 text-emerald-700 px-3 py-1 text-sm ring-1 ring-emerald-200">
+        Next 30d Approved: <span class="ml-1 font-semibold">{{ monthApprovedLeaveRequests?.length || 0 }}</span>
+      </span>
+    </div>
+  </div>
+</div>
+
+<!-- 3-Column Responsive Grid -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+  <!-- Pending by Type (Donut) + List -->
+  <section class="bg-white rounded-2xl border border-slate-200 shadow-sm">
+    <div class="p-4 border-b border-slate-100 flex items-center justify-between">
+      <h2 class="text-sm font-semibold text-slate-800">Pending Requests by Type</h2>
+      <div class="text-xs text-slate-500" *ngIf="isPendingLoading">Loading…</div>
+      <div class="text-xs text-rose-600" *ngIf="!isPendingLoading && pendingErrorMessage">{{ pendingErrorMessage }}</div>
+    </div>
+
+    <!-- Chart -->
+    <div class="p-4">
+      <ng-container *ngIf="pendingDonut?.series?.length; else noPendingChart">
+        <apx-chart
+          [series]="pendingDonut!.series!"
+          [chart]="pendingDonut!.chart!"
+          [labels]="pendingDonut!.labels!"
+          [legend]="pendingDonut!.legend!"
+          [responsive]="pendingDonut?.responsive ?? ([])"
+          [tooltip]="pendingDonut?.tooltip ?? ({})">
+        </apx-chart>
+      </ng-container>
+      <ng-template #noPendingChart>
+        <div class="text-sm text-slate-500">No pending data to chart.</div>
+      </ng-template>
+    </div>
+
+    <!-- List -->
+    <div class="px-4 pb-2">
+      <div class="flex items-center justify-between mb-2">
+        <h3 class="text-xs font-medium text-slate-600 uppercase tracking-wide">Latest Pending</h3>
+        <a routerLink="/leaveRequests"
+           class="text-xs text-emerald-700 hover:text-emerald-800 underline">View all</a>
+      </div>
+
+      <ul class="divide-y divide-slate-100">
+        <li *ngFor="let r of pendingLeaveRequests | slice:0:6" class="py-2.5">
+          <div class="flex items-center justify-between gap-3">
+            <div class="min-w-0">
+              <p class="text-sm font-medium text-slate-800 truncate">
+                {{ r.user.firstName }} {{ r.user.lastName }}
+              </p>
+              <p class="text-xs text-slate-500">
+                {{ r.type}} •
+                {{ r.startDate | date:'MMM d' }} – {{ r.endDate | date:'MMM d' }}
+              </p>
+            </div>
+            <span
+              class="shrink-0 inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium"
+              [ngClass]="{
+                'bg-amber-50 text-amber-700 ring-1 ring-amber-200': r?.status === 0,
+                'bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200': r?.status === 1,
+                'bg-rose-50 text-rose-700 ring-1 ring-rose-200': r?.status === 2
+              }">
+              {{ r?.status === 0 ? 'Pending' : r?.status === 1 ? 'Approved' : r?.status === 2 ? 'Rejected' : 'Status' }}
+            </span>
+          </div>
+        </li>
+
+        <li *ngIf="!pendingLeaveRequests?.length && !isPendingLoading" class="py-4">
+          <p class="text-sm text-slate-500">No pending requests.</p>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- Approved Next 30d (Bar) + List -->
+  <section class="bg-white rounded-2xl border border-slate-200 shadow-sm">
+    <div class="p-4 border-b border-slate-100 flex items-center justify-between">
+      <h2 class="text-sm font-semibold text-slate-800">Approved in Next 30 Days (by Type)</h2>
+      <div class="text-xs text-slate-500" *ngIf="isMonthApprovedLoading">Loading…</div>
+      <div class="text-xs text-rose-600" *ngIf="!isMonthApprovedLoading && monthApprovedErrorMessage">{{ monthApprovedErrorMessage }}</div>
+    </div>
+
+    <!-- Chart -->
+    <div class="p-4">
+      <ng-container *ngIf="approvedNext30Bar?.series?.length; else noApprovedChart">
+        <apx-chart
+          [series]="approvedNext30Bar!.series!"
+          [chart]="approvedNext30Bar!.chart!"
+          [xaxis]="approvedNext30Bar!.xaxis!"
+          [dataLabels]="approvedNext30Bar!.dataLabels!"
+          [legend]="approvedNext30Bar!.legend!"
+          [grid]="approvedNext30Bar?.grid ?? ({})"
+          [yaxis]="approvedNext30Bar?.yaxis ?? ({})"
+          [tooltip]="approvedNext30Bar?.tooltip ?? ({})">
+        </apx-chart>
+      </ng-container>
+      <ng-template #noApprovedChart>
+        <div class="text-sm text-slate-500">No upcoming approved data to chart.</div>
+      </ng-template>
+    </div>
+
+    <!-- List -->
+    <div class="px-4 pb-2">
+      <div class="flex items-center justify-between mb-2">
+        <h3 class="text-xs font-medium text-slate-600 uppercase tracking-wide">Soonest Approved</h3>
+      </div>
+
+      <ul class="divide-y divide-slate-100">
+        <li *ngFor="let r of monthApprovedLeaveRequests | slice:0:6" class="py-2.5">
+          <div class="flex items-center justify-between gap-3">
+            <div class="min-w-0">
+              <p class="text-sm font-medium text-slate-800 truncate">
+                {{ r.user.firstName }} {{ r.user.lastName }}
+              </p>
+              <p class="text-xs text-slate-500">
+                {{ r.type }} •
+                {{ r.startDate | date:'MMM d' }} – {{ r.endDate | date:'MMM d' }}
+              </p>
+            </div>
+            <span class="shrink-0 inline-flex items-center rounded-full bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200 px-2 py-0.5 text-xs font-medium">
+              Approved
+            </span>
+          </div>
+        </li>
+
+        <li *ngIf="!monthApprovedLeaveRequests?.length && !isMonthApprovedLoading" class="py-4">
+          <p class="text-sm text-slate-500">No approved leaves in the next 30 days.</p>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- People Out Trend (Line) + Today’s Out List -->
+  <section class="bg-white rounded-2xl border border-slate-200 shadow-sm">
+    <div class="p-4 border-b border-slate-100 flex items-center justify-between">
+      <h2 class="text-sm font-semibold text-slate-800">People Out — Next 30 Days</h2>
+      <div class="text-xs text-slate-500" *ngIf="isOutTodayLoading">Loading…</div>
+      <div class="text-xs text-rose-600" *ngIf="!isOutTodayLoading && outTodayErrorMessage">{{ outTodayErrorMessage }}</div>
+    </div>
+
+    <!-- Chart -->
+    <div class="p-4">
+      <ng-container *ngIf="outNext30Line?.series?.length; else noTrendChart">
+        <apx-chart
+          [series]="outNext30Line!.series!"
+          [chart]="outNext30Line!.chart!"
+          [xaxis]="outNext30Line!.xaxis!"
+          [dataLabels]="outNext30Line!.dataLabels!"
+          [legend]="outNext30Line!.legend!"
+          [grid]="outNext30Line?.grid ?? ({})"
+          [yaxis]="outNext30Line?.yaxis ?? ({})"
+          [stroke]="outNext30Line?.stroke ?? ({})"
+          [tooltip]="outNext30Line?.tooltip ?? ({})">
+        </apx-chart>
+      </ng-container>
+      <ng-template #noTrendChart>
+        <div class="text-sm text-slate-500">No trend data to chart yet.</div>
+      </ng-template>
+    </div>
+
+    <!-- List -->
+    <div class="px-4 pb-2">
+      <div class="flex items-center justify-between mb-2">
+        <h3 class="text-xs font-medium text-slate-600 uppercase tracking-wide">Out Today</h3>
+        <span class="text-xs text-emerald-700">{{ outTodayPeopleCount }} people</span>
+      </div>
+
+      <ul class="divide-y divide-slate-100">
+        <li *ngFor="let r of outTodayRequests | slice:0:8" class="py-2.5">
+          <div class="flex items-center justify-between gap-3">
+            <div class="min-w-0">
+              <p class="text-sm font-medium text-slate-800 truncate">
+                {{ r.user.firstName }} {{ r.user.lastName }}
+              </p>
+              <p class="text-xs text-slate-500">
+                {{ r.type }}
+                {{ r.startDate | date:'MMM d' }} – {{ r.endDate | date:'MMM d' }}
+              </p>
+            </div>
+            <span class="shrink-0 inline-flex items-center rounded-full bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200 px-2 py-0.5 text-xs font-medium">
+              Out
+            </span>
+          </div>
+        </li>
+
+        <li *ngIf="!outTodayRequests?.length && !isOutTodayLoading" class="py-4">
+          <p class="text-sm text-slate-500">No one is out today.</p>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+</div>
