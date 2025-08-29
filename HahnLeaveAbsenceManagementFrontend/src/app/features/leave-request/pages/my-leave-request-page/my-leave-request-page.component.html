@@ -168,12 +168,15 @@
         </td>
         <td class="px-4 py-2 text-sm text-slate-700">
 
-            <span
+            <button
+              type="button"
               class="text-emerald-600 text-sm underline cursor-pointer hover:text-emerald-700 disabled:opacity-50"
               (click)="cancelLeave(lr)"
+              [disabled]="lr.status !== LeaveStatus.Pending"
+              [class.pointer-events-none]="lr.status !== LeaveStatus.Pending"
             >
             Cancel leave
-          </span>
+          </button>
         </td>
       </tr>
       </tbody>

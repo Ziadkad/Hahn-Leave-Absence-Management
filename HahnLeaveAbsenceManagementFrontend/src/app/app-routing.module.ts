@@ -11,6 +11,7 @@ import {
 import {
   MyLeaveRequestPageComponent
 } from "./features/leave-request/pages/my-leave-request-page/my-leave-request-page.component";
+import {RequestNewLeaveComponent} from "./features/leave-request/pages/request-new-leave/request-new-leave.component";
 
 const routes: Routes = [
   { path: 'dashboard', component: DashboardPageComponent },
@@ -18,7 +19,8 @@ const routes: Routes = [
   { path: 'register', component: RegisterPageComponent},
   { path: 'users', component: UserListPageComponent},
   { path: 'leaveRequests', component: LeaveRequestListPageComponent},
-  { path: 'myleaves', component: MyLeaveRequestPageComponent},
+  { path: 'myleaverequests', component: MyLeaveRequestPageComponent},
+  { path: 'requestnewleave', component: RequestNewLeaveComponent}
 ];
 
 @NgModule({

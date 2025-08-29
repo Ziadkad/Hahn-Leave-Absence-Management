@@ -47,7 +47,6 @@ export class MyLeaveRequestPageComponent {
   };
 
   constructor(private readonly leaveRequestService: LeaveRequestService,
-              private readonly userService: UserService,
               private readonly authService: AuthService,
               private readonly toastr: ToastrService,) {
     effect(()=>{

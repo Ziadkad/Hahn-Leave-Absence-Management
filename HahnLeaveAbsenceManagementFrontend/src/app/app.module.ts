@@ -17,6 +17,8 @@ import { UserListPageComponent } from './features/user/pages/user-list-page/user
 import { LeaveRequestListPageComponent } from './features/leave-request/pages/leave-request-list-page/leave-request-list-page.component';
 import {appConfig} from "./core/interceptors/appConfig";
 import { MyLeaveRequestPageComponent } from './features/leave-request/pages/my-leave-request-page/my-leave-request-page.component';
+import {FullCalendarModule} from "@fullcalendar/angular";
+import { RequestNewLeaveComponent } from './features/leave-request/pages/request-new-leave/request-new-leave.component';
 
 @NgModule({
   declarations: [
@@ -29,7 +31,8 @@ import { MyLeaveRequestPageComponent } from './features/leave-request/pages/my-l
     DashboardPageComponent,
     UserListPageComponent,
     LeaveRequestListPageComponent,
-    MyLeaveRequestPageComponent
+    MyLeaveRequestPageComponent,
+    RequestNewLeaveComponent
   ],
   imports: [
     BrowserModule,
@@ -43,6 +46,7 @@ import { MyLeaveRequestPageComponent } from './features/leave-request/pages/my-l
       positionClass: 'toast-top-right',
       preventDuplicates: true
     }),
+    FullCalendarModule,
   ],
   providers: [appConfig],
   bootstrap: [AppComponent]
