@@ -10,7 +10,7 @@
         Out Today: <span class="ml-1 font-semibold">{{ outTodayPeopleCount }}</span>
       </span>
       <span class="inline-flex items-center rounded-lg bg-emerald-50 text-emerald-700 px-3 py-1 text-sm ring-1 ring-emerald-200">
-        Next 30d Approved: <span class="ml-1 font-semibold">{{ monthApprovedLeaveRequests?.length || 0 }}</span>
+        Next 30d Approved: <span class="ml-1 font-semibold">{{ monthApprovedLeaveRequests.length }}</span>
       </span>
     </div>
   </div>
@@ -29,14 +29,14 @@
 
     <!-- Chart -->
     <div class="p-4">
-      <ng-container *ngIf="pendingDonut?.series?.length; else noPendingChart">
+      <ng-container *ngIf="pendingDonut.series.length; else noPendingChart">
         <apx-chart
-          [series]="pendingDonut!.series!"
-          [chart]="pendingDonut!.chart!"
-          [labels]="pendingDonut!.labels!"
-          [legend]="pendingDonut!.legend!"
-          [responsive]="pendingDonut?.responsive ?? ([])"
-          [tooltip]="pendingDonut?.tooltip ?? ({})">
+          [series]="pendingDonut.series"
+          [chart]="pendingDonut.chart"
+          [labels]="pendingDonut.labels"
+          [legend]="pendingDonut.legend"
+          [responsive]="pendingDonut.responsive || []"
+          [tooltip]="pendingDonut.tooltip || {}">
         </apx-chart>
       </ng-container>
       <ng-template #noPendingChart>
@@ -60,23 +60,19 @@
                 {{ r.user.firstName }} {{ r.user.lastName }}
               </p>
               <p class="text-xs text-slate-500">
-                {{ r.type}} •
+                {{ LeaveType[r.type] }} •
                 {{ r.startDate | date:'MMM d' }} – {{ r.endDate | date:'MMM d' }}
               </p>
             </div>
             <span
               class="shrink-0 inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium"
-              [ngClass]="{
-                'bg-amber-50 text-amber-700 ring-1 ring-amber-200': r?.status === 0,
-                'bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200': r?.status === 1,
-                'bg-rose-50 text-rose-700 ring-1 ring-rose-200': r?.status === 2
-              }">
-              {{ r?.status === 0 ? 'Pending' : r?.status === 1 ? 'Approved' : r?.status === 2 ? 'Rejected' : 'Status' }}
-            </span>
+              [ngClass]="statusClass[r.status]">
+            {{ LeaveStatus[r.status] }}
+          </span>
           </div>
         </li>
 
-        <li *ngIf="!pendingLeaveRequests?.length && !isPendingLoading" class="py-4">
+        <li *ngIf="!pendingLeaveRequests.length && !isPendingLoading" class="py-4">
           <p class="text-sm text-slate-500">No pending requests.</p>
         </li>
       </ul>
@@ -93,16 +89,16 @@
 
     <!-- Chart -->
     <div class="p-4">
-      <ng-container *ngIf="approvedNext30Bar?.series?.length; else noApprovedChart">
+      <ng-container *ngIf="approvedNext30Bar.series.length; else noApprovedChart">
         <apx-chart
-          [series]="approvedNext30Bar!.series!"
-          [chart]="approvedNext30Bar!.chart!"
-          [xaxis]="approvedNext30Bar!.xaxis!"
-          [dataLabels]="approvedNext30Bar!.dataLabels!"
-          [legend]="approvedNext30Bar!.legend!"
-          [grid]="approvedNext30Bar?.grid ?? ({})"
-          [yaxis]="approvedNext30Bar?.yaxis ?? ({})"
-          [tooltip]="approvedNext30Bar?.tooltip ?? ({})">
+          [series]="approvedNext30Bar.series"
+          [chart]="approvedNext30Bar.chart"
+          [xaxis]="approvedNext30Bar.xaxis"
+          [dataLabels]="approvedNext30Bar.dataLabels"
+          [legend]="approvedNext30Bar.legend"
+          [grid]="approvedNext30Bar.grid || {}"
+          [yaxis]="approvedNext30Bar.yaxis || {}"
+          [tooltip]="approvedNext30Bar.tooltip || {}">
         </apx-chart>
       </ng-container>
       <ng-template #noApprovedChart>
@@ -124,7 +120,7 @@
                 {{ r.user.firstName }} {{ r.user.lastName }}
               </p>
               <p class="text-xs text-slate-500">
-                {{ r.type }} •
+                {{ LeaveType[r.type] }} •
                 {{ r.startDate | date:'MMM d' }} – {{ r.endDate | date:'MMM d' }}
               </p>
             </div>
@@ -134,7 +130,7 @@
           </div>
         </li>
 
-        <li *ngIf="!monthApprovedLeaveRequests?.length && !isMonthApprovedLoading" class="py-4">
+        <li *ngIf="!monthApprovedLeaveRequests.length && !isMonthApprovedLoading" class="py-4">
           <p class="text-sm text-slate-500">No approved leaves in the next 30 days.</p>
         </li>
       </ul>
@@ -151,17 +147,17 @@
 
     <!-- Chart -->
     <div class="p-4">
-      <ng-container *ngIf="outNext30Line?.series?.length; else noTrendChart">
+      <ng-container *ngIf="outNext30Line.series.length; else noTrendChart">
         <apx-chart
-          [series]="outNext30Line!.series!"
-          [chart]="outNext30Line!.chart!"
-          [xaxis]="outNext30Line!.xaxis!"
-          [dataLabels]="outNext30Line!.dataLabels!"
-          [legend]="outNext30Line!.legend!"
-          [grid]="outNext30Line?.grid ?? ({})"
-          [yaxis]="outNext30Line?.yaxis ?? ({})"
-          [stroke]="outNext30Line?.stroke ?? ({})"
-          [tooltip]="outNext30Line?.tooltip ?? ({})">
+          [series]="outNext30Line.series"
+          [chart]="outNext30Line.chart"
+          [xaxis]="outNext30Line.xaxis"
+          [dataLabels]="outNext30Line.dataLabels"
+          [legend]="outNext30Line.legend"
+          [grid]="outNext30Line.grid || {}"
+          [yaxis]="outNext30Line.yaxis || {}"
+          [stroke]="outNext30Line.stroke || {}"
+          [tooltip]="outNext30Line.tooltip || {}">
         </apx-chart>
       </ng-container>
       <ng-template #noTrendChart>
@@ -184,7 +180,7 @@
                 {{ r.user.firstName }} {{ r.user.lastName }}
               </p>
               <p class="text-xs text-slate-500">
-                {{ r.type }}
+                {{ LeaveType[r.type] }}
                 {{ r.startDate | date:'MMM d' }} – {{ r.endDate | date:'MMM d' }}
               </p>
             </div>
@@ -194,7 +190,7 @@
           </div>
         </li>
 
-        <li *ngIf="!outTodayRequests?.length && !isOutTodayLoading" class="py-4">
+        <li *ngIf="!outTodayRequests.length && !isOutTodayLoading" class="py-4">
           <p class="text-sm text-slate-500">No one is out today.</p>
         </li>
       </ul>

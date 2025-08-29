@@ -10,6 +10,7 @@ import {
   ApexResponsive, ApexStroke,
   ApexTooltip, ApexXAxis, ApexYAxis
 } from "ng-apexcharts";
+import {LeaveType} from "../../../../core/interfaces/leave-request-interfaces/leave-type";
 
 
 
@@ -72,10 +73,37 @@ export class DashboardPageComponent implements OnInit {
   pendingLeaveRequests: LeaveRequestWithUser[] = [];
   pendingCount : number = 0;
 
+  pendingDonut: DonutOptions = {
+    series: [],
+    chart: { type: 'donut', height: 260 },
+    labels: [],
+    legend: { position: 'bottom' },
+    responsive: [],
+    tooltip: {}
+  };
 
-  pendingDonut!: Partial<DonutOptions>;
-  approvedNext30Bar!: Partial<BarOptions>;
-  outNext30Line!: Partial<LineOptions>;
+  approvedNext30Bar: BarOptions = {
+    series: [], // OK: empty array conforms to ApexAxisChartSeries
+    chart: { type: 'bar', height: 300 },
+    xaxis: { categories: [] },
+    dataLabels: { enabled: true },
+    legend: { position: 'top' },
+    grid: { strokeDashArray: 3 },
+    yaxis: { min: 0, forceNiceScale: true },
+    tooltip: {}
+  };
+
+  outNext30Line: LineOptions = {
+    series: [], // OK
+    chart: { type: 'line', height: 280, zoom: { enabled: false } },
+    xaxis: { categories: [] },
+    dataLabels: { enabled: false },
+    stroke: { curve: 'smooth', width: 3 },
+    legend: { position: 'top' },
+    grid: { strokeDashArray: 3 },
+    yaxis: { min: 0, forceNiceScale: true },
+    tooltip: {}
+  };
 
   constructor(private readonly leaveRequestService : LeaveRequestService) {
   }
@@ -105,33 +133,34 @@ export class DashboardPageComponent implements OnInit {
       next: (data) => {
         const items = data?.items ?? [];
         this.pendingLeaveRequests = items;
-        this.pendingCount = data.totalCount;
+        this.pendingCount = data.totalCount ?? items.length;
+        this.refreshPendingDonut(); // add this
       },
       error: (err) => {
         console.error(err);
         this.pendingErrorMessage =
-          typeof err?.error === 'string'
-            ? err.error
+          typeof err?.error === 'string' ? err.error
             : err?.message ?? 'Failed to load pending leave requests.';
         this.isPendingLoading = false;
       },
-      complete: () => {
-        this.isPendingLoading = false;
-      },
-    })
+      complete: () => { this.isPendingLoading = false; },
+    });
   }
 
   nextMonthApprovedLeaveRequests() {
     this.isMonthApprovedLoading = true;
-    this.pendingErrorMessage = null;
-    const d = new Date();
-    const today =   new Date(d.getFullYear(), d.getMonth(), d.getDate());
+    this.monthApprovedErrorMessage = null; // was: pendingErrorMessage
+
+    const today = this.startOfToday();
+    const in30 = new Date(today);
+    in30.setDate(in30.getDate() + 30); // was: new Date(today.getDay()+30)
+
     const base = {
       userId: undefined,
       type: undefined,
       status: LeaveStatus.Approved,
       startDateFrom: today,
-      startDateTo: new Date(today.getDay()+30),
+      startDateTo: in30,
       endDateFrom: undefined,
       endDateTo: undefined,
       pageQuery: { page: 1, pageSize: 100000 },
@@ -141,20 +170,21 @@ export class DashboardPageComponent implements OnInit {
       next: (data) => {
         const items = data?.items ?? [];
         this.monthApprovedLeaveRequests = items;
-        this.pendingCount = data.totalCount;
+        this.MonthApprovedCount = data?.totalCount ?? items.length; // was: pendingCount
+        this.refreshApprovedNext30Bar();
+        this.refreshOutNext30Line();
       },
       error: (err) => {
         console.error(err);
         this.monthApprovedErrorMessage =
-          typeof err?.error === 'string'
-            ? err.error
-            : err?.message ?? 'Failed to load pending leave requests.';
+          typeof err?.error === 'string' ? err.error :
+            err?.message ?? 'Failed to load approved leave requests.';
         this.isMonthApprovedLoading = false;
       },
       complete: () => {
         this.isMonthApprovedLoading = false;
       },
-    })
+    });
   }
 
   getPeopleOutToday() {
@@ -185,7 +215,7 @@ export class DashboardPageComponent implements OnInit {
           const e = new Date((r as any).endDate);
           return s < end && e >= start;
         });
-
+        this.refreshOutNext30Line();
         this.outTodayRequests = inRange;
         this.outTodayPeopleCount = inRange.length;
       },
@@ -205,12 +235,11 @@ export class DashboardPageComponent implements OnInit {
 
   private refreshPendingDonut() {
     const counts = this.countByType(this.pendingLeaveRequests);
-    const labels = Object.keys(counts);
-    const series = labels.map((k) => counts[k]);
+    const order  = this.enumNamesInOrder(LeaveType); // ["Vacation","Sick","Unpaid"]
 
     this.pendingDonut = {
-      series,
-      labels,
+      series: order.map(n => counts[n] ?? 0),
+      labels: order,
       chart: { type: 'donut', height: 260 },
       legend: { position: 'bottom' },
       responsive: [{ breakpoint: 768, options: { chart: { height: 240 }, legend: { position: 'bottom' } } }],
@@ -220,13 +249,12 @@ export class DashboardPageComponent implements OnInit {
 
   private refreshApprovedNext30Bar() {
     const counts = this.countByType(this.monthApprovedLeaveRequests);
-    const categories = Object.keys(counts);
-    const data = categories.map((k) => counts[k]);
+    const order  = this.enumNamesInOrder(LeaveType); // ["Vacation","Sick","Unpaid"]
 
     this.approvedNext30Bar = {
-      series: [{ name: 'Approved (next 30 days)', data }],
+      series: [{ name: 'Approved (next 30 days)', data: order.map(n => counts[n] ?? 0) }],
       chart: { type: 'bar', height: 300 },
-      xaxis: { categories, labels: { rotate: 0 } },
+      xaxis: { categories: order, labels: { rotate: 0 } },
       dataLabels: { enabled: true },
       legend: { position: 'top' },
       grid: { strokeDashArray: 3 },
@@ -234,6 +262,7 @@ export class DashboardPageComponent implements OnInit {
       yaxis: { min: 0, forceNiceScale: true },
     };
   }
+
 
   private refreshOutNext30Line() {
     const start = this.startOfToday();
@@ -269,11 +298,12 @@ export class DashboardPageComponent implements OnInit {
   private countByType(items: LeaveRequestWithUser[]): Record<string, number> {
     const map: Record<string, number> = {};
     for (const r of items) {
-      const t: string = (r as any).type ?? 'Unknown';
-      map[t] = (map[t] ?? 0) + 1;
+      const label = this.enumName(LeaveType, (r as any).type); // << use enum name
+      map[label] = (map[label] ?? 0) + 1;
     }
     return map;
   }
+
 
   private startOfToday(): Date {
     const d = new Date();
@@ -285,4 +315,38 @@ export class DashboardPageComponent implements OnInit {
     return d.toLocaleDateString(undefined, { day: '2-digit', month: 'short' });
   }
 
+
+  // ---- helpers
+  private enumName(enumObj: any, value: number | string | null | undefined): string {
+    if (value === null || value === undefined) return 'Unknown';
+    const name = enumObj?.[value as any];
+    return typeof name === 'string' ? name : String(value);
+  }
+
+  private enumNamesInOrder(enumObj: any): string[] {
+    // For numeric TS enums this yields ["Vacation","Sick","Unpaid"] in numeric order
+    return Object.keys(enumObj)
+      .filter(k => isNaN(Number(k)))
+      .sort((a, b) => enumObj[a] - enumObj[b]);
+  }
+
+  private countByStatus(items: LeaveRequestWithUser[]): Record<string, number> {
+    const map: Record<string, number> = {};
+    for (const r of items) {
+      const label = this.enumName(LeaveStatus, (r as any).status);
+      map[label] = (map[label] ?? 0) + 1;
+    }
+    return map;
+  }
+
+
+  readonly LeaveType = LeaveType;
+  readonly LeaveStatus = LeaveStatus;
+
+  readonly statusClass: Record<LeaveStatus, string> = {
+    [LeaveStatus.Pending]:  'bg-amber-50 text-amber-700 ring-1 ring-amber-200',
+    [LeaveStatus.Approved]: 'bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200',
+    [LeaveStatus.Rejected]: 'bg-rose-50 text-rose-700 ring-1 ring-rose-200',
+    [LeaveStatus.Cancelled]: 'bg-slate-50 text-slate-700 ring-1 ring-slate-200',
+  };
 }
