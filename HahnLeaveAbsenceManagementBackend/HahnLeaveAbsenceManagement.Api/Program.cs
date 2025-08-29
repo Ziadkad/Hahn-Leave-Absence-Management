@@ -3,6 +3,7 @@ using HahnLeaveAbsenceManagement.Api.Security;
 using HahnLeaveAbsenceManagement.Application;
 using HahnLeaveAbsenceManagement.Infrastructure;
 using HahnLeaveAbsenceManagement.Infrastructure.Data;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -63,5 +64,12 @@ static void MigrateDbToLatestVersion(IApplicationBuilder app)
 {
     using var scope = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>().CreateScope();
     var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    context.Database.Migrate();
+     try
+    {
+        context.Database.Migrate();
+    }
+    catch (SqlException ex) when (ex.Message.Contains("already exists"))
+    {
+        // Optional: log or skip
+    }
 }
