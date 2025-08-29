@@ -40,8 +40,8 @@ export class LeaveRequestService {
     let params = new HttpParams();
 
     if (options.userId) params = params.set('userId', options.userId);
-    if (options.type) params = params.set('type', options.type);
-    if (options.status) params = params.set('status', options.status);
+    if (options.type != null) params = params.set('type', options.type.toString());
+    if (options.status != null) params = params.set('status', options.status.toString());
 
     if (options.startDateFrom) params = params.set('startDateFrom', options.startDateFrom.toISOString());
     if (options.startDateTo) params = params.set('startDateTo', options.startDateTo.toISOString());
