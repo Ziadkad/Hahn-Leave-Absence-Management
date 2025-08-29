@@ -1,34 +1,43 @@
 import {Component, effect} from '@angular/core';
-import {LeaveRequestService} from "../../../../core/services/leave-request-service/leave-request.service";
-import {PageQueryRequest} from "../../../../core/interfaces/common-interfaces/page-query-request";
 import {LeaveRequestWithUser} from "../../../../core/interfaces/leave-request-interfaces/leave-request-with-user";
-import {LeaveType} from "../../../../core/interfaces/leave-request-interfaces/leave-type";
-import {LeaveStatus} from "../../../../core/interfaces/leave-request-interfaces/leave-status";
-import {PageQueryResult} from "../../../../core/interfaces/common-interfaces/page-query-result";
 import {LeaveRequestFilters} from "../../../../core/interfaces/leave-request-interfaces/leave-request-filters";
+import {PageQueryRequest} from "../../../../core/interfaces/common-interfaces/page-query-request";
+import {LeaveRequestService} from "../../../../core/services/leave-request-service/leave-request.service";
 import {UserService} from "../../../../core/services/user-service/user.service";
-import {User} from "../../../../core/interfaces/user-interfaces/user";
-import {UserRole} from "../../../../core/interfaces/user-interfaces/user-Role";
 import {AuthService} from "../../../../core/services/auth-service/auth.service";
 import {ToastrService} from "ngx-toastr";
+import {PageQueryResult} from "../../../../core/interfaces/common-interfaces/page-query-result";
+import {LeaveType} from "../../../../core/interfaces/leave-request-interfaces/leave-type";
+import {LeaveStatus} from "../../../../core/interfaces/leave-request-interfaces/leave-status";
 
 @Component({
-  selector: 'app-leave-request-list-page',
+  selector: 'app-my-leave-request-page',
   standalone: false,
-  templateUrl: './leave-request-list-page.component.html',
-  styleUrl: './leave-request-list-page.component.css'
+  templateUrl: './my-leave-request-page.component.html',
+  styleUrl: './my-leave-request-page.component.css'
 })
-export class LeaveRequestListPageComponent {
+export class MyLeaveRequestPageComponent {
   leaveRequests: LeaveRequestWithUser[] = [];
 
   isLoading = false;
   errorMessage: string | null = null;
-  users : User[] = [];
+
+
+
+
+
+  pageQuery: PageQueryRequest = { page: 1, pageSize: 10 };
+  totalItems = 0;
+
+  LeaveType = LeaveType;
+  LeaveStatus = LeaveStatus;
+
+  userId : string | undefined = undefined;
 
 
 
   filters: LeaveRequestFilters = {
-    userId: undefined,
+    userId: this.userId,
     type: undefined,
     status: undefined,
     startDateFrom: undefined,
@@ -37,28 +46,17 @@ export class LeaveRequestListPageComponent {
     endDateTo: undefined
   };
 
-  pageQuery: PageQueryRequest = { page: 1, pageSize: 10 };
-  totalItems = 0;
-
-  LeaveType = LeaveType;
-  LeaveStatus = LeaveStatus;
-
-
-  userRole: UserRole | undefined;
-
-
   constructor(private readonly leaveRequestService: LeaveRequestService,
               private readonly userService: UserService,
               private readonly authService: AuthService,
               private readonly toastr: ToastrService,) {
     effect(()=>{
       const currentUser = this.authService.currentUser();
-      this.userRole = currentUser?.role;
+      this.userId = currentUser?.id;
     })
   }
 
   ngOnInit(): void {
-    this.loadUsers();
     this.loadLeaveRequests();
   }
 
@@ -82,16 +80,6 @@ export class LeaveRequestListPageComponent {
     });
   }
 
-  loadUsers() {
-    this.userService.getAllUsers().subscribe({
-      next: (res) => {
-        this.users = res;
-      },
-      error: () => {
-        this.errorMessage = 'Failed to load users.';
-      }
-    });
-  }
 
 
   private buildQueryOptions() {
@@ -112,14 +100,14 @@ export class LeaveRequestListPageComponent {
 
 
 
-  onStatusChange(row: LeaveRequestWithUser, next: LeaveStatus) {
-    this.leaveRequestService.updateLeaveRequestStatus(row.id,{id : row.id,status: next}).subscribe({
+  cancelLeave(row: LeaveRequestWithUser) {
+    this.leaveRequestService.updateLeaveRequestStatus(row.id,{id : row.id,status: LeaveStatus.Cancelled}).subscribe({
       next: (res) => {
         this.toastr.success('Leave request status updated successfully!', 'Success');
         this.loadLeaveRequests();
       },
       error: (e) =>{
-        this.toastr.error('Failed to update leave request status.' + e.message);
+        this.toastr.error('Failed to cancel leave. Please inform your HR manager');
       }
     })
   }
@@ -143,16 +131,10 @@ export class LeaveRequestListPageComponent {
     this.loadLeaveRequests();
   }
 
-
-  leaveStatusOptions = Object.keys(LeaveStatus)
-    .filter(k => isNaN(Number(k))) // keep enum names only
-    .map(k => ({ label: k, value: (LeaveStatus as any)[k] as LeaveStatus }));
-
   onEndDateToChange(value: string) {
     this.filters.endDateTo = value ? new Date(value + 'T00:00:00') : undefined;
   }
 
   protected readonly isNaN = isNaN;
   protected readonly Math = Math;
-  protected readonly UserRole = UserRole;
 }

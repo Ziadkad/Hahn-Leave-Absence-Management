@@ -2,28 +2,13 @@
   <!-- Header -->
   <div class="flex items-center justify-between mb-6">
     <div>
-      <h2 class="text-lg font-semibold text-slate-800">Leave Requests</h2>
+      <h2 class="text-lg font-semibold text-slate-800">My Leaves</h2>
       <p class="text-sm text-slate-500">Total: {{ totalItems }}</p>
     </div>
   </div>
 
   <div class="mb-4">
     <div class="grid grid-cols-1 md:grid-cols-12 gap-3">
-      <!-- Row 1 -->
-      <div class="md:col-span-3">
-        <label class="block text-xs font-medium text-slate-700 mb-0.5">User</label>
-        <select
-          class="w-full h-9 rounded-md border border-slate-300 bg-white px-2 text-sm outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 disabled:opacity-50"
-          [(ngModel)]="filters.userId"
-          [disabled]="isLoading"
-        >
-          <option [ngValue]="undefined">All users</option>
-          <option *ngFor="let u of users" [ngValue]="u.id">
-            {{ u.firstName }} {{ u.lastName }}
-          </option>
-        </select>
-      </div>
-
 
       <div class="md:col-span-3">
         <label class="block text-xs font-medium text-slate-700 mb-0.5">Type</label>
@@ -38,6 +23,21 @@
           </ng-container>
         </select>
       </div>
+
+        <div class="md:col-span-3">
+          <label class="block text-xs font-medium text-slate-700 mb-0.5">Status</label>
+          <select
+            class="w-full h-9 rounded-md border border-slate-300 bg-white px-2 text-sm outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 disabled:opacity-50"
+            [(ngModel)]="filters.status"
+            [disabled]="isLoading"
+          >
+            <option [ngValue]="undefined">Any</option>
+            <ng-container *ngFor="let s of (LeaveStatus | keyvalue)">
+              <option *ngIf="!isNaN(+s.key)" [ngValue]="+s.key">{{ s.value }}</option>
+            </ng-container>
+          </select>
+        </div>
+
 
       <div class="md:col-span-3">
         <label class="block text-xs font-medium text-slate-700 mb-0.5">Start date (from)</label>
@@ -62,19 +62,6 @@
         />
       </div>
 
-      <div class="md:col-span-3">
-        <label class="block text-xs font-medium text-slate-700 mb-0.5">Status</label>
-        <select
-          class="w-full h-9 rounded-md border border-slate-300 bg-white px-2 text-sm outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 disabled:opacity-50"
-          [(ngModel)]="filters.status"
-          [disabled]="isLoading"
-        >
-          <option [ngValue]="undefined">Any</option>
-          <ng-container *ngFor="let s of (LeaveStatus | keyvalue)">
-            <option *ngIf="!isNaN(+s.key)" [ngValue]="+s.key">{{ s.value }}</option>
-          </ng-container>
-        </select>
-      </div>
 
       <div class="md:col-span-3">
         <label class="block text-xs font-medium text-slate-700 mb-0.5">End date (from)</label>
@@ -97,6 +84,8 @@
           [ngModelOptions]="{ standalone: true }"
           [disabled]="isLoading"
         />
+      </div>
+      <div class="md:col-span-3">
       </div>
 
       <!-- Actions (compact) -->
@@ -145,20 +134,17 @@
     <table class="min-w-full rounded-xl overflow-hidden">
       <thead class="bg-emerald-50">
       <tr>
-        <th class="px-4 py-2 text-left text-xs font-semibold tracking-wide text-emerald-700 uppercase">User</th>
         <th class="px-4 py-2 text-left text-xs font-semibold tracking-wide text-emerald-700 uppercase">Type</th>
         <th class="px-4 py-2 text-left text-xs font-semibold tracking-wide text-emerald-700 uppercase">Start</th>
         <th class="px-4 py-2 text-left text-xs font-semibold tracking-wide text-emerald-700 uppercase">End</th>
         <th class="px-4 py-2 text-left text-xs font-semibold tracking-wide text-emerald-700 uppercase">Business days</th>
         <th class="px-4 py-2 text-left text-xs font-semibold tracking-wide text-emerald-700 uppercase">Status</th>
         <th class="px-4 py-2 text-left text-xs font-semibold tracking-wide text-emerald-700 uppercase">Description</th>
+        <th class="px-4 py-2 text-left text-xs font-semibold tracking-wide text-emerald-700 uppercase">Actions</th>
       </tr>
       </thead>
       <tbody>
       <tr *ngFor="let lr of leaveRequests" class="odd:bg-slate-50 hover:bg-emerald-50/50 transition-colors">
-        <td class="px-4 py-2 text-sm text-slate-700">
-          {{ lr.user?.firstName }} {{ lr.user?.lastName }}
-        </td>
         <td class="px-4 py-2 text-sm text-slate-700">
           {{ LeaveType[lr.type] }}
         </td>
@@ -171,26 +157,23 @@
         <td class="px-4 py-2 text-sm text-slate-700">
           {{ lr.businessDays }}
         </td>
-        <td  *ngIf="userRole == UserRole.Employee ||lr.status != LeaveStatus.Pending " class="px-4 py-2 text-sm">
+        <td class="px-4 py-2 text-sm">
             <span class="inline-flex items-center rounded-full bg-emerald-50 text-emerald-700 px-2 py-0.5 text-xs font-medium">
               {{ LeaveStatus[lr.status] }}
             </span>
         </td>
-        <td *ngIf="userRole == UserRole.HumanResourcesManager && lr.status == LeaveStatus.Pending" class="px-4 py-2 text-sm">
-          <select
-            class="h-8 rounded-md border border-slate-300 bg-white px-2 text-xs outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 disabled:opacity-50"
-            [ngModel]="lr.status"
-            (ngModelChange)="onStatusChange(lr, $event)"
-            [disabled]="isLoading"
-          >
-            <option *ngFor="let opt of leaveStatusOptions" [ngValue]="opt.value">
-              {{ opt.label }}
-            </option>
-          </select>
-        </td>
 
         <td class="px-4 py-2 text-sm text-slate-700">
           <div class="max-w-xs truncate" title="{{ lr.description }}">{{ lr.description == "" ? "--": lr.description }}</div>
+        </td>
+        <td class="px-4 py-2 text-sm text-slate-700">
+
+            <span
+              class="text-emerald-600 text-sm underline cursor-pointer hover:text-emerald-700 disabled:opacity-50"
+              (click)="cancelLeave(lr)"
+            >
+            Cancel leave
+          </span>
         </td>
       </tr>
       </tbody>

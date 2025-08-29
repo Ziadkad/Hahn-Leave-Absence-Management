@@ -16,6 +16,7 @@ import {HttpClientModule} from "@angular/common/http";
 import { UserListPageComponent } from './features/user/pages/user-list-page/user-list-page.component';
 import { LeaveRequestListPageComponent } from './features/leave-request/pages/leave-request-list-page/leave-request-list-page.component';
 import {appConfig} from "./core/interceptors/appConfig";
+import { MyLeaveRequestPageComponent } from './features/leave-request/pages/my-leave-request-page/my-leave-request-page.component';
 
 @NgModule({
   declarations: [
@@ -27,7 +28,8 @@ import {appConfig} from "./core/interceptors/appConfig";
     LoginFormComponent,
     DashboardPageComponent,
     UserListPageComponent,
-    LeaveRequestListPageComponent
+    LeaveRequestListPageComponent,
+    MyLeaveRequestPageComponent
   ],
   imports: [
     BrowserModule,
