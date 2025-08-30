@@ -49,3 +49,28 @@ docker compose ps
 #   http://localhost:4000/swagger
 
 ```
+## Features
+
+- Authentication (sign in / sign out, JWT)
+- User Management
+- Leave Requests (create/cancel, list & filter, approvals / rejections)
+- Health (liveness/readiness checks for container orchestration)
+
+
+---
+
+## Screenshots
+
+Drop your PNG/JPG files into `docs/screenshots/` and link them here:
+
+- **Public Home**  
+  ![Public Home](docs/screenshots/public-home.png)
+
+- **Dashboard**  
+  ![Dashboard](docs/screenshots/dashboard.png)
+
+- **Request Flow**  
+  ![Request Flow](docs/screenshots/new-request.png)
+
+- **Approvals**  
+  ![Approvals](docs/screenshots/approvals.png)
