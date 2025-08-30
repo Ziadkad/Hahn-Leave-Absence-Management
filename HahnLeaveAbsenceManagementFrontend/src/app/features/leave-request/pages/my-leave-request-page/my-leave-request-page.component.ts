@@ -52,11 +52,11 @@ export class MyLeaveRequestPageComponent {
     effect(()=>{
       const currentUser = this.authService.currentUser();
       this.userId = currentUser?.id;
+      if (this.userId) {
+        this.filters.userId = this.userId;
+        this.loadLeaveRequests();
+      }
     })
-  }
-
-  ngOnInit(): void {
-    this.loadLeaveRequests();
   }
 
   loadLeaveRequests(): void {

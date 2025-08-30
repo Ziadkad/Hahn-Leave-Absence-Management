@@ -85,12 +85,13 @@
         [attr.aria-invalid]="registerForm.get('role')?.invalid && registerForm.get('role')?.touched"
       >
         <option [ngValue]="null" disabled>Select role</option>
-        <option *ngFor="let r of roles" [value]="r.value">{{ r.label }}</option>
+        <option *ngFor="let r of roles" [ngValue]="r.value">{{ r.label }}</option>
       </select>
       <div *ngIf="registerForm.get('role')?.touched && registerForm.get('role')?.invalid" class="mt-1 text-sm text-red-600">
         <span *ngIf="registerForm.get('role')?.errors?.['required']">Role is required.</span>
       </div>
     </div>
+
   </div>
 
   <!-- Error Message (top-level) -->

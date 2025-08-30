@@ -34,7 +34,7 @@ export class RegisterFormComponent implements OnInit {
       lastName: ['', [Validators.required, Validators.maxLength(50)]],
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(8)]],
-      role: [null, [Validators.required]]
+      role: [null as UserRole | null, [Validators.required]],
     });
   }
 
@@ -54,7 +54,7 @@ export class RegisterFormComponent implements OnInit {
       lastName,
       email,
       password,
-      role: Number(role) as UserRole,
+      role,
     };
 
     this.authService.register(payload).subscribe({

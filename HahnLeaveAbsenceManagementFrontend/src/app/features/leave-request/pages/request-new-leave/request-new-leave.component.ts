@@ -64,12 +64,15 @@ export class RequestNewLeaveComponent implements OnInit {
     effect(()=>{
       const currentUser = this.authService.currentUser();
       this.userId = currentUser?.id;
+      if(this.userId){
+        this.getMyLeaveRequests();
+        this.getLeavesLeft();
+      }
     })
   }
 
   ngOnInit(): void {
-    this.getMyLeaveRequests();
-    this.getLeavesLeft();
+
     this.createForm = this.fb.group(
       {
         type: [null as LeaveType | null, Validators.required],
